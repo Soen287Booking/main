@@ -21,8 +21,8 @@
           <li class="nav-item"><a class="nav-link" href="resources.html">Resources</a></li>
         </ul>
         <div class="d-flex">
-          <a href="sign_in.html" class="btn btn-outline-primary me-2">Sign In</a>
-          <a href="sign_up.html" class="btn btn-primary">Sign Up</a>
+          <a href="profile.html" class="btn btn-outline-primary me-2">My Account</a>
+          <a href="sign_up.html" class="btn btn-primary">Sign Out</a>
         </div>
       </div>
     </div>
@@ -41,6 +41,7 @@
           <div class="col-md-8 d-flex align-items-end">
             <button class="btn btn-outline-secondary me-2" type="button" id="prevDay">← Prev</button>
             <button class="btn btn-outline-secondary" type="button" id="nextDay">Next →</button>
+            <button class="btn btn-outline-danger ms-2" type="button" id="resetDay">Reset day</button>
           </div>
 
           <div class="col-12">
@@ -304,8 +305,23 @@
             return;
           }
         }
+        
+const user = JSON.parse(localStorage.getItem("user") || "{}");
+const resourceName = room.title || roomId;
 
-        selectedSlots.forEach(s => {
+selectedSlots.forEach(s => {
+  saveBooking({
+    roomId,
+    date: isoDate,
+    start: minutesToHHMM(s.start),
+    end: minutesToHHMM(s.end),
+    name: user.email,
+    resourceName
+  });
+});
+
+window.location.replace("profile.html");
+        /*selectedSlots.forEach(s => {
           saveBooking({
             roomId,
             date: isoDate,
@@ -313,7 +329,7 @@
             end: minutesToHHMM(s.end),
             name: 'Reserved'
           });
-        });
+        });*/
 
         renderSlotGrid(isoDate);
         renderDayBookings(isoDate);
@@ -327,6 +343,34 @@
       console.error(err);
     }
   })();
+  window.addEventListener('storage', (e) => {
+  if (e.key && e.key !== 'bookingsDB') return; 
+  const iso = getDateISO();       
+  renderSlotGrid(iso);            
+  renderDayBookings(iso);         
+});
+
+import { read, write } from './js/store.js';
+
+document.getElementById('resetDay').addEventListener('click', () => {
+  const iso = getDateISO();           
+  const db = read();
+  if (!db[roomId]?.[iso]) {               
+    renderSlotGrid(iso);
+    renderDayBookings(iso);
+    return;
+  }
+
+  if (!confirm(`Clear ALL bookings for ${iso}?`)) return;
+
+  delete db[roomId][iso];        
+  if (Object.keys(db[roomId]).length === 0) delete db[roomId];
+  write(db);
+
+  selectedSlots = [];
+  renderSlotGrid(iso);
+  renderDayBookings(iso);
+});
 </script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

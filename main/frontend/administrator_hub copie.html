@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Hub</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Admin-specific CSS -->
+    <link rel="stylesheet" href="style3.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="admin index.html">Campus Booking</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="admin index.html">Main</a></li>
+                    <li class="nav-item"><a class="nav-link" href="resources.html">Resources</a></li>
+                    <!-- Admin Hub link (hidden by default) -->
+                    <li class="nav-item" id="admin-link" style="display: none;">
+                        
+                    </li>
+                </ul>
+                
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Admin Hub Section -->
+    <main class="container mt-5 pt-5">
+        <h1 class="text-center mb-4">Welcome, Admin 👨‍💼👩‍💼</h1>
+
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="list-group shadow-sm">
+                    <a href="manage.html" class="list-group-item list-group-item-action">📋 Manage Resources</a>
+                    <a href="managebooking.html" class="list-group-item list-group-item-action">🗓 Manage Bookings</a>
+                    <a href="stats.html" class="list-group-item list-group-item-action">📈 View Statistics</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer border-top mt-5 py-3">
+        <div class="container text-center">
+            <p>© 2025 Campus Booking | Concordia University Project</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Admin JS: Role-based access -->
+    <script>
+        // Simulate current user
+        // In real application, get this from server/auth system
+        const currentUser = {
+            username: "youssef",
+            role: "admin" // change to "user" to test non-admin
+        };
+
+        // Show Admin Hub link in navbar only for admins
+        const adminLink = document.getElementById("admin-link");
+        if (currentUser.role === "admin") {
+            adminLink.style.display = "block";
+        }
+
+        // Protect Admin Hub page itself
+        if (currentUser.role !== "admin") {
+            alert("Access denied! Redirecting to main page.");
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

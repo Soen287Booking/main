@@ -126,3 +126,4 @@ function esc(s){ return String(s||"").replaceAll("&","&amp;").replaceAll("<","&l
 window.checkAuth = checkAuth;
 window.loadBookings = loadBookings;
 window.logoutUser = logoutUser;
+

@@ -321,16 +321,7 @@ selectedSlots.forEach(s => {
 });
 
 window.location.replace("profile.html");
-        /*selectedSlots.forEach(s => {
-          saveBooking({
-            roomId,
-            date: isoDate,
-            start: minutesToHHMM(s.start),
-            end: minutesToHHMM(s.end),
-            name: 'Reserved'
-          });
-        });*/
-
+       
         renderSlotGrid(isoDate);
         renderDayBookings(isoDate);
         selectedSlots = [];

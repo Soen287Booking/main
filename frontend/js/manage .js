@@ -12,15 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const saveBtn = document.getElementById("save-resource-btn");
   const resetBtn = document.getElementById("reset-form-btn");
 
-  let resources = [];
+  let resources = JSON.parse(localStorage.getItem("resources")) || [];
 
-  // messages
+  // ✅ Helper: Show temporary messages
   function showMessage(text) {
     msg.innerHTML = `<div class="alert alert-info" role="alert">${text}</div>`;
     setTimeout(() => { msg.innerHTML = ""; }, 3000);
   }
 
-  // render table
+  // ✅ Display resource table
   function displayResources() {
     tableBody.innerHTML = "";
 
@@ -33,14 +33,17 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    resources.forEach((resource, index) => {
+    resources.forEach((r, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${resource.title}</td>
-        <td>${resource.category}</td>
-        <td>${resource.location}</td>
-        <td>${resource.capacity}</td>
-        <td>${resource.availability}</td>
+        <td>${r.title}</td>
+        <td>${r.category}</td>
+        <td>${r.location}</td>
+        <td>${r.capacity}</td>
+        <td>
+          <input type="checkbox" class="availability-toggle" data-index="${index}" ${r.availability === "true" ? "checked" : ""}>
+          ${r.availability === "true" ? "✅ Available" : "❌ Not Available"}
+        </td>
         <td class="text-end">
           <button class="btn btn-sm btn-secondary me-2 edit-btn" data-index="${index}">Edit</button>
           <button class="btn btn-sm btn-danger delete-btn" data-index="${index}">Delete</button>
@@ -50,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // create or update
+  // ✅ Add/Update Resource
   form.addEventListener("submit", function (event) {
     event.preventDefault();
 
@@ -59,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const location = locationField.value.trim();
     const capacity = capacityField.value.trim();
     const availability = availabilityField.value;
-    const editIndex = idField.value; // <-- define it
+    const editIndex = idField.value;
 
     if (!title || !category || !location || !capacity || !availability) {
       showMessage("Please fill in all fields.");
@@ -69,68 +72,69 @@ document.addEventListener("DOMContentLoaded", function () {
     const resource = { title, category, location, capacity, availability };
 
     if (editIndex !== "") {
-      // UPDATE
       resources[Number(editIndex)] = resource;
-      localStorage.setItem("resources", JSON.stringify(resources));
-      displayResources();
       showMessage("Resource updated successfully!");
-      form.reset();
-      idField.value = "";
-      saveBtn.textContent = "Save Resource";
-      return;
+    } else {
+      resources.push(resource);
+      showMessage("Resource added successfully!");
     }
 
-    // CREATE
-    resources.push(resource);
     localStorage.setItem("resources", JSON.stringify(resources));
     displayResources();
-    showMessage("Resource added successfully!");
     form.reset();
+    idField.value = "";
+    saveBtn.textContent = "Save Resource";
   });
 
-  // reset: exit edit mode
+  // ✅ Reset form
   resetBtn.addEventListener("click", () => {
     idField.value = "";
     saveBtn.textContent = "Save Resource";
   });
 
-  // delete (event delegation)
-  tableBody.addEventListener("click", function (event) {
-    const delBtn = event.target.closest(".delete-btn");
-    if (!delBtn) return;
-
-    const index = Number(delBtn.dataset.index);
-    resources.splice(index, 1);
-    localStorage.setItem("resources", JSON.stringify(resources));
-    displayResources();
-    showMessage("Resource deleted successfully!");
-  });
-
-  // edit (event delegation)
+  // ✅ Edit Resource
   tableBody.addEventListener("click", function (event) {
     const editBtn = event.target.closest(".edit-btn");
     if (!editBtn) return;
 
     const index = Number(editBtn.dataset.index);
     const r = resources[index];
-    if (!r) return;
 
     idField.value = index;
-    titleField.value = r.title || "";
-    categoryField.value = r.category || "";
-    locationField.value = r.location || "";
-    capacityField.value = r.capacity || "";
-    availabilityField.value = r.availability || "true";
+    titleField.value = r.title;
+    categoryField.value = r.category;
+    locationField.value = r.location;
+    capacityField.value = r.capacity;
+    availabilityField.value = r.availability;
 
     saveBtn.textContent = "Update Resource";
-    showMessage("Editing mode: modify fields and click Update.");
+    showMessage("Editing mode activated.");
   });
 
-  // load from localStorage
-  const storedResources = localStorage.getItem("resources");
-  if (storedResources) {
-    resources = JSON.parse(storedResources);
-  }
+  // ✅ Delete Resource
+  tableBody.addEventListener("click", function (event) {
+    const delBtn = event.target.closest(".delete-btn");
+    if (!delBtn) return;
 
+    const index = Number(delBtn.dataset.index);
+    if (confirm("Delete this resource?")) {
+      resources.splice(index, 1);
+      localStorage.setItem("resources", JSON.stringify(resources));
+      displayResources();
+      showMessage("Resource deleted successfully!");
+    }
+  });
+
+  // ✅ Toggle Availability (ON/OFF)
+  tableBody.addEventListener("change", function (event) {
+    if (!event.target.classList.contains("availability-toggle")) return;
+    const index = event.target.getAttribute("data-index");
+    const newState = event.target.checked ? "true" : "false";
+    resources[index].availability = newState;
+    localStorage.setItem("resources", JSON.stringify(resources));
+    displayResources();
+  });
+
+  // ✅ Initial load
   displayResources();
 });
